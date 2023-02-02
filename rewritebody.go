@@ -89,6 +89,8 @@ func (r *rewriteBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		bodyBytes = rwt.regex.ReplaceAll(bodyBytes, rwt.replacement)
 	}
 
+	bodyBytes = normalizeBytes(bodyBytes)
+
 	if _, err := rw.Write(bodyBytes); err != nil {
 		log.Printf("unable to write rewrited body: %v", err)
 	}
@@ -100,6 +102,10 @@ type responseWriter struct {
 	wroteHeader  bool
 
 	http.ResponseWriter
+}
+
+func normalizeBytes(in []byte) []byte {
+    return norm.NFC.Bytes(in)
 }
 
 func (r *responseWriter) WriteHeader(statusCode int) {
